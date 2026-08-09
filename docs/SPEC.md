@@ -16,14 +16,14 @@ abertos em cartas individuais. Cada carta pode ser guardada, jogada, provada
 ou trocada separadamente.
 
 O objetivo não é criar supply fixo por carta. A empresa pode vender novos
-boosters indefinidamente. O objetivo é tornar pública e verificável a política
-de distribuição por raridade e impedir que:
+boosters indefinidamente. O objetivo é tornar pública a política de
+distribuição por raridade e, como extensão desejável, permitir que qualquer
+pessoa audite a justiça do sorteio. O protocolo deve impedir que:
 
 - a wallet invente cartas que não pertencem ao catálogo;
 - uma carta gasta seja reutilizada;
 - a mint escolha ou descubra desnecessariamente a carta específica recebida;
-- a mint transforme uma carta rara em uma carta comum, ou vice-versa, fora da
-  política publicada;
+- a wallet apresente uma carta fora da policy publicada;
 - uma troca aceite apenas uma prova antiga sem consumir o ativo original.
 
 Esta especificação descreve um protocolo novo de *private collectible ecash*.
@@ -48,6 +48,12 @@ A primeira versão completa deve permitir:
 9. rejeitar reuso, replay, cartas fora do catálogo e raridades inválidas;
 10. permitir que um cliente de jogo leia as propriedades assinadas da carta
     sem hard-code de cada carta.
+
+A prova de que o sorteio foi justo é um *nice to have* do protocolo. Sem essa
+extensão, a mint continua responsável por executar honestamente a
+`BoosterPolicy`; com ela, o comprador e auditores independentes podem verificar
+que o resultado foi derivado corretamente sem a mint precisar revelar as
+cartas individuais.
 
 O protótipo atualmente implementado no repositório cobre somente uma parte
 menor: credencial individual local, blind DHKE baseado em Cashu e transferência
@@ -226,6 +232,11 @@ da mint e uma prova verificável.
 
 ## 7. Boosters e distribuição
 
+A `BoosterPolicy` é uma interface do protocolo para descrever slots, raridades
+e algoritmo. A composição concreta é configuração da aplicação. A prova
+criptográfica de justiça do sorteio descrita na seção 7.3 é opcional e deve ser
+implementada depois do núcleo de posse e transferência.
+
 ### 7.1 Política
 
 Cada época/versão de boosters publica uma política assinada. Ela define:
@@ -277,10 +288,11 @@ Uma afirmação como “10% mythic” precisa declarar se significa:
 
 Sem essa escolha, “proporção” não é uma propriedade verificável.
 
-### 7.3 Sorteio sem conhecimento desnecessário da mint
+### 7.3 Extensão opcional: sorteio justo e privado
 
-O objetivo é que a mint conheça o catálogo e a política, mas não precise
-aprender qual carta individual foi atribuída a uma wallet.
+O objetivo desta extensão é que a mint conheça o catálogo e a política, mas
+não precise aprender qual carta individual foi atribuída a uma wallet, e que o
+resultado possa ser auditado por terceiros.
 
 Um fluxo conceitual é:
 
@@ -294,13 +306,15 @@ Um fluxo conceitual é:
 7. Mint assina cegamente as credenciais dos commitments.
 ```
 
-O protocolo precisa impedir que a wallet escolha livremente uma carta rara e
-apresente um resultado inventado. Também precisa impedir que a mint escolha o
-resultado depois de conhecer toda a entropia da wallet.
+Quando esta extensão estiver habilitada, o protocolo precisa impedir que a
+wallet escolha livremente uma carta rara e apresente um resultado inventado.
+Também precisa impedir que a mint escolha o resultado depois de conhecer toda
+a entropia da wallet.
 
 Commit-reveal simples não basta se uma das partes puder escolher sua semente
 depois de observar a outra. A construção final deve especificar o compromisso,
-as contribuições de entropia, a ordem das mensagens e a prova de correção.
+as contribuições de entropia, a ordem das mensagens e a prova de correção. Sem
+essa extensão, a mint é a autoridade confiável para a execução da policy.
 
 ## 8. Compra e abertura de booster
 
@@ -511,7 +525,8 @@ A primeira implementação criptográfica deve testar pelo menos:
 - abertura alterada invalida a credencial;
 - carta fora do catálogo é rejeitada;
 - raridade incompatível é rejeitada;
-- prova de booster incorreta é rejeitada;
+- prova de booster incorreta é rejeitada, quando a extensão de sorteio justo
+  estiver habilitada;
 - nonce ou operação repetida não emite novamente;
 - nullifier repetido é rejeitado;
 - transferência não expõe o `card_id` à mint, se essa for a propriedade
@@ -551,7 +566,7 @@ O código atual ainda não implementa:
 - `BoosterPolicy`;
 - compra e abertura de boosters;
 - sorteio com entropia conjunta;
-- prova ZK de catálogo, raridade ou correção do sorteio;
+- prova ZK de catálogo, raridade ou correção do sorteio (extensão opcional);
 - prova de posse online;
 - persistência da mint;
 - cliente de jogo;
@@ -570,6 +585,10 @@ As respostas atuais fecham três decisões de escopo:
 3. A primeira versão deve provar posse atual. O mecanismo inicial será
    revelação seletiva com challenge-response; provas ZK serão adicionadas quando
    for necessário provar atributos sem revelar o `card_id`.
+4. A prova criptográfica de que o sorteio do booster foi justo é um *nice to
+   have*, não um requisito para fechar o núcleo inicial. A primeira versão pode
+   confiar na mint para executar honestamente a policy; a extensão futura deve
+   permitir auditoria independente sem revelar as cartas individuais.
 
 Ainda faltam decisões criptográficas de implementação, especialmente o formato
 exato da challenge-response, o vínculo entre a credencial e a chave do dono,
