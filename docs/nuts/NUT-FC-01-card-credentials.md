@@ -79,6 +79,10 @@ O envelope público não inclui:
 - abertura completa do commitment;
 - chave privada do dono.
 
+`owner_public_key` continua público no envelope desta versão e pode permitir
+linkage entre credenciais da mesma wallet. O protocolo não promete anonimato
+absoluto.
+
 O `definition_hash` é uma referência pública. O cliente pode obter a definição
 assinada pelo catálogo e revelar o `card_id` apenas numa apresentação de carta.
 

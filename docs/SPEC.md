@@ -55,10 +55,11 @@ extensão, a mint continua responsável por executar honestamente a
 que o resultado foi derivado corretamente sem a mint precisar revelar as
 cartas individuais.
 
-O protótipo atualmente implementado no repositório cobre somente uma parte
-menor: credencial individual local, blind DHKE baseado em Cashu e transferência
-atómica em memória. Ele ainda não implementa boosters, sorteio verificável,
-persistência ou provas ZK.
+O primeiro corte implementado no repositório cobre o núcleo local: catálogo e
+policy assinados, compra e abertura de booster com sorteio confiado na mint,
+credenciais individuais, challenge-response de posse, envelope Cashu estendido
+e transferência atómica em memória. Ele ainda não implementa sorteio
+verificável, persistência, idempotência após crash ou provas ZK.
 
 ## 3. Modelo de confiança
 
@@ -559,22 +560,29 @@ A primeira implementação criptográfica deve testar pelo menos:
 O código atual implementa:
 
 - `Asset` e `AssetCatalog` locais;
+- `CardDefinition` e `BoosterPolicy` assinadas pela mint;
 - credencial individual com abertura, commitment e nullifier;
 - assinatura blindada usando `cashu==0.20.2`;
+- compra e abertura de boosters configuráveis, com prevenção de reabertura;
+- prova de posse atual com chave do dono e challenge-response;
+- envelope Cashu estendido sem serializar a abertura privada;
 - `LocalMint.consume_and_issue` atómico em memória;
 - rejeição de double spend e credencial inválida;
 - CLI e testes unitários.
 
 O código atual ainda não implementa:
 
-- `BoosterPolicy`;
-- compra e abertura de boosters;
 - sorteio com entropia conjunta;
 - prova ZK de catálogo, raridade ou correção do sorteio (extensão opcional);
-- prova de posse online;
 - persistência da mint;
+- idempotência e recuperação após perda de resposta ou crash;
 - cliente de jogo;
 - Nostr/Blossom.
+
+No corte local, a operação de transferência ainda entrega a credencial antiga
+completa à `LocalMint` para que ela valide a abertura. O envelope público não
+contém essa abertura, mas a privacidade contra a própria mint ainda depende da
+prova ZK de equivalência prevista para uma versão futura.
 
 ## 16. Decisões de produto já tomadas
 
