@@ -3,13 +3,12 @@
 NutFC is the first small prototype for NutsFT: a collectible credential flow
 built on top of Cashu/Nutshell primitives.
 
-This repository is experimental. The first cut is intentionally local and
-does not claim production privacy, ZK security, marketplace support, or
-solvency. It demonstrates the core state transition before those layers are
-added:
+This repository is experimental. It does not claim production privacy, ZK
+security, marketplace support, persistent recovery, fair booster draws, or
+solvency. The current local cut demonstrates:
 
 ```text
-issue → verify → consume old credential + issue new credential → reject reuse
+catalog → booster policy → card credentials → possession proof → atomic transfer
 ```
 
 ## Development
@@ -26,12 +25,19 @@ The implementation reuses `cashu==0.20.2` (Nutshell) for Cashu's blind
 Diffie–Hellman signature primitives. It does not start a network mint or move
 real ecash.
 
+The current extended-token shape is documented in [NUT-FC-01](docs/nuts/NUT-FC-01-card-credentials.md).
+It is a local experimental proposal, not an official Cashu NUT.
+
 ## Scope and limits
 
-- The catalog is local and static.
-- The mint is an in-memory authority with an in-memory spent set.
-- The credential's local opening contains the asset identity; this prototype
-  does not yet implement the zero-knowledge relation needed to hide that
-  identity during every transfer check.
-- Nostr, boosters, persistence, recovery, and production threat-model work are
-  deliberately out of scope for this first implementation.
+- The catalog and booster policy are local and signed by the in-memory mint.
+- The mint is an in-memory authority with in-memory spent sets.
+- Card tokens use a Cashu `Proof`-shaped section plus NutFC metadata; the
+  public envelope excludes the card opening, owner secret, and salt.
+- Possession uses a fresh owner-key challenge-response and a mint state check.
+- Booster draws follow the configured policy, but fairness proofs are optional
+  future work; this cut trusts the mint to draw honestly.
+- The local transfer path still validates the full credential inside the mint;
+  hiding the card identity during transfer requires the future ZK relation.
+- Nostr, persistence, crash recovery, and production threat-model work remain
+  future work.

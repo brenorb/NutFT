@@ -485,6 +485,10 @@ revela. A mint não deve publicar automaticamente o inventário de uma wallet.
 O formato exato ainda depende da extensão escolhida sobre Cashu. A separação
 recomendada é:
 
+O protótipo usa a proposta local [NUT-FC-01](nuts/NUT-FC-01-card-credentials.md)
+para o envelope Cashu estendido. Ela não é uma NUT oficial e não altera os
+proofs Cashu; acrescenta referências NutFC e regras de apresentação.
+
 ```json
 {
   "protocol": "nutfc",
