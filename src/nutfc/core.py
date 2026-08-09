@@ -92,7 +92,9 @@ class PendingCredential:
     blinded_message: PublicKey
     blinding_factor: PrivateKey
 
-    def finalize(self, response: BlindSignature, issuer_public_key: PublicKey) -> Credential:
+    def finalize(
+        self, response: BlindSignature, issuer_public_key: PublicKey
+    ) -> Credential:
         signed_blinded_message = PublicKey(bytes.fromhex(response.C_))
         signature = step3_alice(
             signed_blinded_message,
@@ -151,7 +153,9 @@ class Credential:
 
     @property
     def nullifier(self) -> str:
-        material = f"nutfc:nullifier:{self.collection_id}:{self.asset_id}:{self.owner_secret}"
+        material = (
+            f"nutfc:nullifier:{self.collection_id}:{self.asset_id}:{self.owner_secret}"
+        )
         return hashlib.sha256(material.encode()).hexdigest()
 
     def verify(self, issuer_public_key: PublicKey) -> bool:
