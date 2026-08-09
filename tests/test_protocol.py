@@ -62,6 +62,9 @@ def test_owner_bound_challenge_response_proves_current_possession(
 
     assert mint.verify_possession(credential, proof, challenge)
     assert not mint.verify_possession(credential, proof, b"game-session:other")
+    assert not mint.verify_possession(
+        credential, replace(proof, card_id="mythic-1"), challenge
+    )
 
 
 def test_spent_credential_cannot_pass_current_possession_check(
@@ -101,6 +104,18 @@ def test_transfer_requires_the_current_owner_key(
         bob.transfer(credential, carol)
 
 
+def test_transfer_destination_exposes_no_recipient_unblinding_secret(
+    mint: LocalMint, catalog: AssetCatalog
+) -> None:
+    bob = Wallet(mint, catalog)
+
+    pending = bob.prepare_destination("rare-1")
+    destination = pending.destination
+
+    assert not hasattr(destination, "owner_secret")
+    assert not hasattr(destination, "blinding_factor")
+
+
 def test_booster_opening_emits_one_card_per_configured_slot(
     mint: LocalMint, catalog: AssetCatalog
 ) -> None:
@@ -116,7 +131,7 @@ def test_booster_opening_emits_one_card_per_configured_slot(
     )
 
     booster = alice.buy_booster(policy)
-    cards = alice.open_booster(booster)
+    cards = alice.open_booster(booster, policy)
 
     assert len(cards) == 12
     assert Counter(card.asset.rarity for card in cards) == {
@@ -128,7 +143,7 @@ def test_booster_opening_emits_one_card_per_configured_slot(
     assert mint.is_booster_spent(booster.booster_id)
 
     with pytest.raises(DoubleSpendError):
-        alice.open_booster(booster)
+        alice.open_booster(booster, policy)
 
 
 def test_cashu_extended_token_round_trips_without_private_opening(
