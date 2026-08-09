@@ -39,8 +39,9 @@ A primeira versão completa deve permitir:
 2. publicar uma política assinada de boosters;
 3. comprar e abrir um booster;
 4. receber várias `CardCredential`, uma por slot do booster;
-5. manter o `card_id` e as propriedades da carta privados para observadores e
-   para a mint, quando o protocolo de emissão permitir;
+5. manter o `card_id` e a posse da carta privados para observadores e para a
+   mint, quando o protocolo de emissão permitir; as propriedades são públicas
+   no catálogo depois que a carta é identificada;
 6. provar a validade de uma carta e de suas propriedades;
 7. provar posse atual para jogar ou negociar;
 8. trocar uma carta através de `consume(old) → issue(new)` atómico;
@@ -256,7 +257,10 @@ Exemplo conceitual de composição:
 }
 ```
 
-Os números acima são apenas exemplo e não são uma decisão do protocolo.
+Os números acima formam o perfil da primeira implementação (`1 rare`, `3
+uncommon`, `8 common`). Eles não fazem parte do protocolo criptográfico: o
+protocolo recebe uma `BoosterPolicy` versionada e funciona com qualquer número
+de slots, classes e regras de distribuição válidas.
 
 ### 7.2 Supply variável
 
@@ -356,7 +360,13 @@ Recebe a abertura, a definição e a credencial. Confirma:
 
 ### 9.2 Revelação seletiva
 
-Revela apenas os atributos necessários, como:
+Revelação seletiva não é uma prova ZK. É o mecanismo mais simples para a
+primeira versão: a wallet revela apenas os campos necessários e mantém os
+segredos criptográficos fora da mensagem. Como as definições e propriedades
+das cartas são públicas no catálogo, normalmente basta revelar o `card_id` e
+provar que a wallet controla a credencial correspondente.
+
+Uma revelação seletiva pode conter:
 
 ```text
 collection_id = set-alpha
@@ -365,16 +375,23 @@ card_id = set-alpha:001
 power >= 5
 ```
 
-O verificador não precisa receber o `salt`, o `owner_secret` ou outras
-propriedades não relacionadas à partida.
+O verificador não precisa receber o `salt`, o `owner_secret`, o commitment
+interno ou outras propriedades não relacionadas à partida. O conteúdo
+revelado deve ser acompanhado por uma assinatura/prova vinculada a um desafio
+novo do verificador. Assim, o verificador sabe que a wallet controla a
+credencial, e não apenas que alguém copiou um JSON antigo.
+
+Se a privacidade exigida for “provar que tenho uma carta desta classe sem dizer
+qual carta é”, então revelação seletiva deixa de ser suficiente e será
+necessária uma prova ZK de atributo.
 
 ### 9.3 Prova de posse atual
 
 Uma prova de “eu possuo ou possuí um Black Lotus” não é suficiente para uma
 troca. Ela pode referir-se a uma credencial já gasta.
 
-Para provar posse atual sem transferir a carta, a wallet deve responder a um
-desafio novo, vinculado a:
+Na primeira versão, a posse atual será demonstrada por revelação seletiva mais
+challenge-response. A wallet deve responder a um desafio novo, vinculado a:
 
 - o verificador;
 - a sessão;
@@ -382,8 +399,10 @@ desafio novo, vinculado a:
 - uma consulta de estado ou prova de não-gasto da mint;
 - uma expiração curta.
 
-Para uma troca, a operação correta é a transferência atómica, não uma prova
-solta.
+Para uma troca, a operação correta continua sendo a transferência atómica, não
+uma prova solta. A challenge-response prova controle naquele momento, mas a
+mint ainda precisa confirmar o estado não gasto ou executar diretamente o
+`consume_and_issue`.
 
 ## 10. Transferência atómica
 
@@ -538,25 +557,21 @@ O código atual ainda não implementa:
 - cliente de jogo;
 - Nostr/Blossom.
 
-## 16. Decisões necessárias para fechar a especificação
+## 16. Decisões de produto já tomadas
 
-As próximas três decisões bloqueiam o desenho detalhado das mensagens e das
-provas:
+As respostas atuais fecham três decisões de escopo:
 
-1. **Qual composição de booster devemos usar como primeiro exemplo?**
-   Precisamos definir slots e quantidades — por exemplo, 1 raro, 3 incomuns e
-   8 comuns — e escolher se a proporção vale por booster, por lote ou como
-   probabilidade independente.
+1. A primeira implementação usará, como exemplo, boosters com 1 rara, 3
+   incomuns e 8 comuns. A composição é configuração da policy, não parte fixa
+   do protocolo.
+2. As definições e propriedades das cartas são públicas no catálogo. O
+   protocolo protege a posse, a abertura e o vínculo entre a wallet e a carta;
+   não precisa esconder as regras depois que o `card_id` for revelado.
+3. A primeira versão deve provar posse atual. O mecanismo inicial será
+   revelação seletiva com challenge-response; provas ZK serão adicionadas quando
+   for necessário provar atributos sem revelar o `card_id`.
 
-2. **As propriedades e regras da carta serão públicas no catálogo ou só serão
-   reveladas quando a carta for aberta/jogada?** A imagem pode continuar sendo
-   um ponteiro Blossom, mas precisamos decidir o que qualquer pessoa pode
-   consultar pelo `card_id`.
-
-3. **Qual é o primeiro nível de prova que o produto precisa suportar?** Podemos
-   começar com revelação seletiva de `card_id` + credencial, ou exigir desde a
-   primeira versão uma prova ZK de posse/propriedades sem revelar a carta.
-
-Até essas decisões, a arquitetura geral está definida, mas o formato final da
-policy de booster, o circuito de sorteio e o protocolo de verificação ainda não
-estão fechados.
+Ainda faltam decisões criptográficas de implementação, especialmente o formato
+exato da challenge-response, o vínculo entre a credencial e a chave do dono,
+o circuito ZK do sorteio e o formato final de armazenamento Cashu/NutFC. Essas
+decisões podem ser fechadas depois do primeiro protótipo de posse.
