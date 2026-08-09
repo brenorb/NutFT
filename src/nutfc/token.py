@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from cashu.core.base import Proof
+from cashu.core.crypto.keys import PublicKey
 
 from .core import Credential
 
@@ -68,6 +69,17 @@ class NutFCToken:
 
     def serialize(self) -> str:
         return json.dumps(self.to_dict(), sort_keys=True, separators=(",", ":"))
+
+    def validate_against(
+        self, credential: Credential, issuer_public_key: PublicKey
+    ) -> bool:
+        """Validate the public envelope against its wallet-held credential."""
+        expected = NutFCToken.from_credential(credential, mint_url=self.mint_url)
+        return (
+            self.cashu == expected.cashu
+            and self.nutfc == expected.nutfc
+            and credential.verify(issuer_public_key)
+        )
 
     @classmethod
     def deserialize(cls, serialized: str) -> NutFCToken:

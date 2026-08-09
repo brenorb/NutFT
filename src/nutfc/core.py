@@ -10,7 +10,8 @@ from dataclasses import dataclass, field, replace
 from threading import RLock
 
 from cashu.core.crypto.b_dhke import (
-    carol_verify_dleq,
+    alice_verify_dleq,
+    hash_to_curve,
     step1_alice,
     step2_bob,
     step3_alice,
@@ -60,6 +61,24 @@ def _verify_signature(
 ) -> bool:
     try:
         return key.verify(bytes.fromhex(signature), _message(domain, value))
+    except (TypeError, ValueError):
+        return False
+
+
+def _verify_cashu_signature(
+    secret: str, signature: Signature, issuer_public_key: PublicKey
+) -> bool:
+    """Verify a current Cashu DLEQ proof without legacy compatibility fallbacks."""
+    try:
+        r = PrivateKey(bytes.fromhex(signature.r))
+        c = PublicKey(bytes.fromhex(signature.C))
+        e = PrivateKey(bytes.fromhex(signature.e))
+        s = PrivateKey(bytes.fromhex(signature.s))
+        blinded_message = hash_to_curve(secret.encode()) + r.public_key
+        blinded_signature = c + issuer_public_key * r
+        return alice_verify_dleq(
+            blinded_message, blinded_signature, e, s, issuer_public_key
+        )
     except (TypeError, ValueError):
         return False
 
@@ -381,19 +400,11 @@ class Credential:
         return hashlib.sha256(material.encode()).hexdigest()
 
     def verify(self, issuer_public_key: PublicKey) -> bool:
-        try:
-            return self.asset.verify_issuer_signature(
-                issuer_public_key
-            ) and carol_verify_dleq(
-                self.cashu_secret,
-                PrivateKey(bytes.fromhex(self.signature.r)),
-                PublicKey(bytes.fromhex(self.signature.C)),
-                PrivateKey(bytes.fromhex(self.signature.e)),
-                PrivateKey(bytes.fromhex(self.signature.s)),
-                issuer_public_key,
-            )
-        except (TypeError, ValueError):
-            return False
+        return self.asset.verify_issuer_signature(
+            issuer_public_key
+        ) and _verify_cashu_signature(
+            self.cashu_secret, self.signature, issuer_public_key
+        )
 
 
 @dataclass(slots=True)
@@ -408,13 +419,18 @@ class BoosterCredential:
 
     def verify(self, issuer_public_key: PublicKey) -> bool:
         try:
-            return carol_verify_dleq(
-                self.secret,
-                PrivateKey(bytes.fromhex(self.signature.r)),
-                PublicKey(bytes.fromhex(self.signature.C)),
-                PrivateKey(bytes.fromhex(self.signature.e)),
-                PrivateKey(bytes.fromhex(self.signature.s)),
-                issuer_public_key,
+            fields = json.loads(self.secret)
+            if not isinstance(fields, dict) or any(
+                fields.get(key) != value
+                for key, value in (
+                    ("booster_id", self.booster_id),
+                    ("policy_hash", self.policy_hash),
+                    ("owner_public_key", self.owner_public_key),
+                )
+            ):
+                return False
+            return _verify_cashu_signature(
+                self.secret, self.signature, issuer_public_key
             )
         except (TypeError, ValueError):
             return False

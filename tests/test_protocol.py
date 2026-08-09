@@ -146,6 +146,21 @@ def test_booster_opening_emits_one_card_per_configured_slot(
         alice.open_booster(booster, policy)
 
 
+def test_booster_metadata_is_bound_to_its_signed_secret(
+    mint: LocalMint, catalog: AssetCatalog
+) -> None:
+    alice = Wallet(mint, catalog)
+    policy = BoosterPolicy(
+        policy_id="demo-v1",
+        collection_id="demo-cards",
+        slots=(BoosterSlot("rare", "rare"),),
+    )
+    booster = alice.buy_booster(policy)
+
+    assert booster.verify(mint.public_key)
+    assert not replace(booster, policy_hash="tampered").verify(mint.public_key)
+
+
 def test_cashu_extended_token_round_trips_without_private_opening(
     mint: LocalMint, catalog: AssetCatalog
 ) -> None:
@@ -164,3 +179,7 @@ def test_cashu_extended_token_round_trips_without_private_opening(
     assert public["nutfc"]["card_commitment"] == credential.commitment
     assert "owner_secret" not in serialized
     assert "salt" not in serialized
+    assert token.validate_against(credential, mint.public_key)
+
+    parsed.nutfc["rarity"] = "common"
+    assert not parsed.validate_against(credential, mint.public_key)
