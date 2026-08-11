@@ -1,4 +1,4 @@
-# NutFC — Especificação do protocolo
+# NutFT — Especificação do protocolo
 
 **Status:** draft de arquitetura e protocolo  
 **Versão:** 0.1  
@@ -6,7 +6,7 @@
 
 ## 1. Resumo
 
-NutFC é um protocolo de cartas colecionáveis digitais privadas, inspirado em
+NutFT é um protocolo de cartas colecionáveis digitais privadas, inspirado em
 Magic: The Gathering e construído sobre primitivas Cashu/Nutshell.
 
 Uma empresa opera a mint. A mint é simultaneamente a fábrica digital das
@@ -84,7 +84,7 @@ A mint não deve precisar conhecer:
 
 A mint continua sendo uma autoridade central. Ela pode censurar, ficar offline,
 emitir novas cartas, alterar políticas futuras ou comportar-se de forma
-maliciosa. NutFC não promete descentralização, supply fixo ou solvência da
+maliciosa. NutFT não promete descentralização, supply fixo ou solvência da
 empresa.
 
 ### 3.2 Wallet
@@ -141,7 +141,7 @@ Exemplo conceitual:
 
 ```json
 {
-  "protocol": "nutfc-card-definition",
+  "protocol": "nutft-card-definition",
   "version": 1,
   "collection_id": "set-alpha",
   "card_id": "set-alpha:001",
@@ -216,13 +216,13 @@ verificador, por exemplo:
 
 ```json
 {
-  "protocol": "nutfc-card",
+  "protocol": "nutft-card",
   "version": 1,
   "mint": "https://mint.example",
   "collection_id": "set-alpha",
   "card_commitment": "...",
   "nullifier_key_id": "...",
-  "credential": "cashu-or-nutfc-credential",
+  "credential": "cashu-or-nutft-credential",
   "proof": "..."
 }
 ```
@@ -263,7 +263,7 @@ Exemplo conceitual de composição:
     {"slot_id": "common", "rarity": "common", "count": 8}
   ],
   "draw_mode": "independent-per-slot",
-  "algorithm": "nutfc-draw-v1",
+  "algorithm": "nutft-draw-v1",
   "policy_hash": "...",
   "issuer_signature": "..."
 }
@@ -276,7 +276,7 @@ de slots, classes e regras de distribuição válidas.
 
 ### 7.2 Supply variável
 
-NutFC não fixa quantas unidades de uma carta existirão para sempre. A política
+NutFT não fixa quantas unidades de uma carta existirão para sempre. A política
 define como cada booster é composto e pode ser aplicada a uma quantidade
 variável de boosters vendidos.
 
@@ -486,20 +486,20 @@ revela. A mint não deve publicar automaticamente o inventário de uma wallet.
 O formato exato ainda depende da extensão escolhida sobre Cashu. A separação
 recomendada é:
 
-O protótipo usa a proposta local [NUT-FC-01](nuts/NUT-FC-01-card-credentials.md)
+O protótipo usa a proposta local [NUT-FT-01](nuts/NUT-FT-01-card-credentials.md)
 para o envelope Cashu estendido. Ela não é uma NUT oficial e não altera os
-proofs Cashu; acrescenta referências NutFC e regras de apresentação.
+proofs Cashu; acrescenta referências NutFT e regras de apresentação.
 
 ```json
 {
-  "protocol": "nutfc",
+  "protocol": "nutft",
   "version": 1,
   "mint": "https://mint.example",
   "unit": "card",
   "credential": {
     "commitment": "...",
     "signature": "...",
-    "proof_system": "nutfc-zk-v1"
+    "proof_system": "nutft-zk-v1"
   },
   "cashu": {
     "proofs_or_reference": "..."
@@ -518,7 +518,7 @@ revele à mint.
 
 Ainda falta decidir se o `cashu` será:
 
-- um proof Cashu real com extensão NutFC;
+- um proof Cashu real com extensão NutFT;
 - uma credencial separada que usa Cashu apenas como settlement;
 - ou uma nova unidade/protocolo compatível apenas no nível das primitivas.
 
@@ -604,5 +604,5 @@ As respostas atuais fecham três decisões de escopo:
 
 Ainda faltam decisões criptográficas de implementação, especialmente o formato
 exato da challenge-response, o vínculo entre a credencial e a chave do dono,
-o circuito ZK do sorteio e o formato final de armazenamento Cashu/NutFC. Essas
+o circuito ZK do sorteio e o formato final de armazenamento Cashu/NutFT. Essas
 decisões podem ser fechadas depois do primeiro protótipo de posse.

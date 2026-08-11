@@ -6,7 +6,7 @@ from dataclasses import replace
 
 import pytest
 
-from nutfc.core import (
+from nutft.core import (
     Asset,
     AssetCatalog,
     BoosterPolicy,
@@ -16,7 +16,7 @@ from nutfc.core import (
     PossessionError,
     Wallet,
 )
-from nutfc.token import NutFCToken
+from nutft.token import NutFTToken
 
 
 @pytest.fixture
@@ -166,20 +166,20 @@ def test_cashu_extended_token_round_trips_without_private_opening(
 ) -> None:
     alice = Wallet(mint, catalog)
     credential = alice.mint("rare-1")
-    token = NutFCToken.from_credential(credential, mint_url=mint.mint_url)
+    token = NutFTToken.from_credential(credential, mint_url=mint.mint_url)
 
     serialized = token.serialize()
-    parsed = NutFCToken.deserialize(serialized)
+    parsed = NutFTToken.deserialize(serialized)
     public = json.loads(serialized)
 
     assert parsed == token
-    assert public["protocol"] == "nutfc"
+    assert public["protocol"] == "nutft"
     assert public["cashu"]["unit"] == "card"
     assert public["cashu"]["proofs"][0]["amount"] == 1
-    assert public["nutfc"]["card_commitment"] == credential.commitment
+    assert public["nutft"]["card_commitment"] == credential.commitment
     assert "owner_secret" not in serialized
     assert "salt" not in serialized
     assert token.validate_against(credential, mint.public_key)
 
-    parsed.nutfc["rarity"] = "common"
+    parsed.nutft["rarity"] = "common"
     assert not parsed.validate_against(credential, mint.public_key)

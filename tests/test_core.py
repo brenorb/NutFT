@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from nutfc.core import (
+from nutft.core import (
     Asset,
     AssetCatalog,
     DoubleSpendError,

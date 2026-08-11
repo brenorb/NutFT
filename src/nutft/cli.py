@@ -1,4 +1,4 @@
-"""Command-line happy-path demonstration for NutFC."""
+"""Command-line happy-path demonstration for NutFT."""
 
 from collections import Counter
 
@@ -34,17 +34,17 @@ def main() -> None:
     )
     booster = alice.buy_booster(policy)
     cards = alice.open_booster(booster, policy)
-    possession = alice.prove_possession(cards[0], b"nutfc-demo")
+    possession = alice.prove_possession(cards[0], b"nutft-demo")
     original = alice.mint("black-lotus")
     received = alice.transfer(original, bob)
 
-    print("NutFC local demo")
+    print("NutFT local demo")
     print(
         f"booster cards: {len(cards)} ({dict(Counter(card.asset.rarity for card in cards))})"
     )
     print(
         "possession proof valid: "
-        f"{mint.verify_possession(cards[0], possession, b'nutfc-demo')}"
+        f"{mint.verify_possession(cards[0], possession, b'nutft-demo')}"
     )
     print(f"asset transferred: {received.asset.name} ({received.asset.rarity})")
     print(f"original commitment: {original.commitment[:16]}…")

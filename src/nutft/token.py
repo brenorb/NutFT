@@ -1,6 +1,6 @@
-"""Cashu-extended NutFC card token envelope.
+"""Cashu-extended NutFT card token envelope.
 
-The envelope keeps the Cashu proof material and NutFC references together, but
+The envelope keeps the Cashu proof material and NutFT references together, but
 does not serialize the wallet's card opening or owner secret.
 """
 
@@ -18,15 +18,15 @@ from .core import Credential
 
 
 @dataclass(frozen=True, slots=True)
-class NutFCToken:
+class NutFTToken:
     mint_url: str
     cashu: dict[str, Any]
-    nutfc: dict[str, Any]
+    nutft: dict[str, Any]
 
     @classmethod
-    def from_credential(cls, credential: Credential, *, mint_url: str) -> NutFCToken:
+    def from_credential(cls, credential: Credential, *, mint_url: str) -> NutFTToken:
         proof = Proof(
-            id="nutfc-card-v1",
+            id="nutft-card-v1",
             amount=1,
             secret=credential.cashu_secret,
             C=credential.signature.C,
@@ -45,7 +45,7 @@ class NutFCToken:
                 "unit": "card",
                 "proofs": [proof],
             },
-            nutfc={
+            nutft={
                 "version": 1,
                 "collection_id": credential.collection_id,
                 "card_commitment": credential.commitment,
@@ -60,11 +60,11 @@ class NutFCToken:
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "protocol": "nutfc",
+            "protocol": "nutft",
             "version": 1,
             "mint": self.mint_url,
             "cashu": self.cashu,
-            "nutfc": self.nutfc,
+            "nutft": self.nutft,
         }
 
     def serialize(self) -> str:
@@ -74,31 +74,31 @@ class NutFCToken:
         self, credential: Credential, issuer_public_key: PublicKey
     ) -> bool:
         """Validate the public envelope against its wallet-held credential."""
-        expected = NutFCToken.from_credential(credential, mint_url=self.mint_url)
+        expected = NutFTToken.from_credential(credential, mint_url=self.mint_url)
         return (
             self.cashu == expected.cashu
-            and self.nutfc == expected.nutfc
+            and self.nutft == expected.nutft
             and credential.verify(issuer_public_key)
         )
 
     @classmethod
-    def deserialize(cls, serialized: str) -> NutFCToken:
+    def deserialize(cls, serialized: str) -> NutFTToken:
         try:
             payload = json.loads(serialized)
         except json.JSONDecodeError as error:
-            raise ValueError("invalid NutFC token JSON") from error
+            raise ValueError("invalid NutFT token JSON") from error
         if (
             not isinstance(payload, dict)
-            or payload.get("protocol") != "nutfc"
+            or payload.get("protocol") != "nutft"
             or payload.get("version") != 1
             or not isinstance(payload.get("mint"), str)
             or not isinstance(payload.get("cashu"), dict)
-            or not isinstance(payload.get("nutfc"), dict)
+            or not isinstance(payload.get("nutft"), dict)
         ):
-            raise ValueError("invalid NutFC token envelope")
-        nutfc = payload["nutfc"]
+            raise ValueError("invalid NutFT token envelope")
+        nutft = payload["nutft"]
         if "opening" in payload or any(
-            key in nutfc for key in ("opening", "owner_secret", "salt")
+            key in nutft for key in ("opening", "owner_secret", "salt")
         ):
             raise ValueError("private card opening must not be in a public token")
         cashu = payload["cashu"]
@@ -116,5 +116,5 @@ class NutFCToken:
         return cls(
             mint_url=payload["mint"].rstrip("/"),
             cashu=payload["cashu"],
-            nutfc=payload["nutfc"],
+            nutft=payload["nutft"],
         )

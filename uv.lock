@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.12"
 
 [options]
-exclude-newer = "2026-08-02T01:37:54.904908Z"
+exclude-newer = "2026-08-04T16:11:44.139173Z"
 exclude-newer-span = "P7D"
 
 [options.exclude-newer-package]
@@ -838,7 +838,7 @@ wheels = [
 ]
 
 [[package]]
-name = "nutfc"
+name = "nutft"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

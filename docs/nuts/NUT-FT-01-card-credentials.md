@@ -1,4 +1,4 @@
-# NUT-FC-01 — Card credentials over Cashu
+# NUT-FT-01 — Card credentials over Cashu
 
 **Status:** proposta local experimental; não é uma NUT oficial atribuída pelo
 protocolo Cashu.  
@@ -11,10 +11,10 @@ Cashu `Proof` conhece valor, unidade, mint, segredo e assinatura. Ele não
 conhece `card_id`, definição de carta, raridade, slot de booster ou proprietário
 da credencial.
 
-NUT-FC-01 define um envelope de aplicação que transporta um proof Cashu de
-valor `1` junto com referências NutFC. A unidade `card` representa uma carta
+NUT-FT-01 define um envelope de aplicação que transporta um proof Cashu de
+valor `1` junto com referências NutFT. A unidade `card` representa uma carta
 individual; a identidade e as propriedades são ligadas por uma credencial
-NutFC, não por campos arbitrários dentro do `Proof`.
+NutFT, não por campos arbitrários dentro do `Proof`.
 
 Esta proposta não define:
 
@@ -31,7 +31,7 @@ assinatura:
 
 ```json
 {
-  "protocol": "nutfc",
+  "protocol": "nutft",
   "version": 1,
   "mint": "https://mint.example",
   "cashu": {
@@ -39,7 +39,7 @@ assinatura:
     "unit": "card",
     "proofs": [
       {
-        "id": "nutfc-card-v1",
+        "id": "nutft-card-v1",
         "amount": 1,
         "secret": "<opaque-card-commitment>",
         "C": "<cashu-signature>",
@@ -51,7 +51,7 @@ assinatura:
       }
     ]
   },
-  "nutfc": {
+  "nutft": {
     "version": 1,
     "collection_id": "set-alpha",
     "card_commitment": "<same-value-as-cashu-secret>",
@@ -67,7 +67,7 @@ assinatura:
 
 `cashu.proofs` deve seguir o modelo de `cashu.core.base.Proof` de
 `cashu==0.20.2`. O proof deve ter `amount=1`, unidade `card` e um `secret`
-igual ao `card_commitment` NutFC.
+igual ao `card_commitment` NutFT.
 
 ## 3. Privacidade
 
@@ -96,7 +96,7 @@ Para a primeira versão, a wallet pode apresentar:
 
 ```json
 {
-  "protocol": "nutfc-possession-v1",
+  "protocol": "nutft-possession-v1",
   "challenge": "<nonce-do-verificador>",
   "collection_id": "set-alpha",
   "card_id": "set-alpha:001",
@@ -136,16 +136,16 @@ entre a carta antiga e o destino novo.
 ## 6. Compatibilidade Cashu
 
 Um cliente Cashu genérico pode reconhecer a seção `cashu` apenas se aceitar a
-unidade `card` e a mint correspondente. Ele não entenderá as garantias NutFC,
+unidade `card` e a mint correspondente. Ele não entenderá as garantias NutFT,
 como `definition_hash`, ownership ou policy de booster.
 
-Um cliente NutFC deve:
+Um cliente NutFT deve:
 
 1. validar a estrutura Cashu;
-2. validar a relação `cashu.proofs[0].secret == nutfc.card_commitment`;
+2. validar a relação `cashu.proofs[0].secret == nutft.card_commitment`;
 3. validar a definição e a assinatura da mint;
 4. manter a abertura fora do envelope público;
-5. aplicar as regras NutFC antes de exibir ou aceitar a carta.
+5. aplicar as regras NutFT antes de exibir ou aceitar a carta.
 
 ## 7. Boosters
 
@@ -159,7 +159,7 @@ verificável de sorteio sem alterar o formato básico da `CardCredential`.
 
 ## 8. Estado experimental
 
-NUT-FC-01 é uma proposta para discussão. Antes de submeter algo ao protocolo
+NUT-FT-01 é uma proposta para discussão. Antes de submeter algo ao protocolo
 Cashu, ainda são necessários:
 
 - revisão do uso de `unit=card` por wallets Cashu existentes;

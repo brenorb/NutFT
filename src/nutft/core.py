@@ -1,4 +1,4 @@
-"""Minimal NutFC protocol primitives built on Cashu/Nutshell crypto."""
+"""Minimal NutFT protocol primitives built on Cashu/Nutshell crypto."""
 
 from __future__ import annotations
 
@@ -20,27 +20,27 @@ from cashu.core.crypto.keys import PrivateKey
 from cashu.core.crypto.secp import PublicKey
 
 
-class NutFCError(Exception):
+class NutFTError(Exception):
     """Base class for expected protocol failures."""
 
 
-class UnknownAssetError(NutFCError):
+class UnknownAssetError(NutFTError):
     """The catalog does not contain the requested asset."""
 
 
-class InvalidCredentialError(NutFCError):
+class InvalidCredentialError(NutFTError):
     """A credential signature, opening, or definition is invalid."""
 
 
-class DoubleSpendError(NutFCError):
+class DoubleSpendError(NutFTError):
     """A credential or booster has already been consumed."""
 
 
-class PossessionError(NutFCError):
+class PossessionError(NutFTError):
     """The caller cannot prove control of the current owner key."""
 
 
-class InvalidPolicyError(NutFCError):
+class InvalidPolicyError(NutFTError):
     """A booster policy is malformed or not issued by this mint."""
 
 
@@ -49,7 +49,7 @@ def _canonical(value: object) -> str:
 
 
 def _message(domain: str, value: object) -> bytes:
-    return f"nutfc:{domain}:".encode() + _canonical(value).encode()
+    return f"nutft:{domain}:".encode() + _canonical(value).encode()
 
 
 def _sign(key: PrivateKey, domain: str, value: object) -> str:
@@ -190,7 +190,7 @@ class BoosterPolicy:
     policy_id: str
     collection_id: str
     slots: tuple[BoosterSlot, ...]
-    algorithm: str = "nutfc-draw-v1"
+    algorithm: str = "nutft-draw-v1"
     issuer_signature: str = ""
 
     def __post_init__(self) -> None:
@@ -396,7 +396,7 @@ class Credential:
 
     @property
     def nullifier(self) -> str:
-        material = f"nutfc:nullifier:{self.collection_id}:{self.commitment}:{self.owner_secret}"
+        material = f"nutft:nullifier:{self.collection_id}:{self.commitment}:{self.owner_secret}"
         return hashlib.sha256(material.encode()).hexdigest()
 
     def verify(self, issuer_public_key: PublicKey) -> bool:
@@ -439,7 +439,7 @@ class BoosterCredential:
 class LocalMint:
     """An in-memory mint and spent-state authority for the first prototype."""
 
-    keyset_id = "nutfc-card-v1"
+    keyset_id = "nutft-card-v1"
 
     def __init__(
         self, catalog: AssetCatalog, mint_url: str = "https://mint.local"
