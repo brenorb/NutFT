@@ -65,14 +65,16 @@ card. Issuance follows NUT-04 and NUT-31.
 For each output, the mint MUST:
 
 1. validate `unit=collection_id` and `amount=1`;
-2. validate the cleartext NutFT declaration accompanying `B_`;
+2. validate the disclosed NutFT secret and blind factor against `B_`;
 3. verify that `asset_id` exists in the catalog at `catalog_uri`;
-4. compute the expected `asset_binding` from the declaration;
+4. compute the expected `asset_binding` from the disclosed secret;
 5. sign the blinded message `B_`;
 6. return a DLEQ proof when NUT-12 is supported.
 
-The mint sees the asset reference but not the secret hidden behind `B_`. It
-validates the revealed NutFT secret when the resulting proof is spent.
+The mint sees the NutFT secret and blind factor and confirms that they produce
+`B_` before signing. This sacrifices output-to-proof unlinkability so the demo
+can guarantee exact card preservation without zero-knowledge proofs. The P2BK
+secret still does not reveal the recipient's long-lived public key.
 
 ## 5. Wallet display
 
@@ -102,9 +104,9 @@ The mint MUST validate the consumed proof and destination before marking the
 old proof spent. The new proof MUST preserve the exact same asset reference and
 `asset_binding`. If issuance fails, the old proof remains spendable.
 
-The demo demonstrates a P2BK recipient destination when supported. P2BK hides
-the recipient's long-lived public key from the mint but does not hide the card
-identity or trading volume. Ordinary P2PK destinations may also be used.
+The demo requires a P2BK recipient destination. P2BK hides the recipient's
+long-lived public key from the mint but does not hide the card identity or
+trading volume.
 
 A generic swap or other operation that consumes a NutFT proof and issues a new
 proof without preserving its NutFT secret and `asset_binding` MUST be rejected.
