@@ -1,0 +1,6 @@
+[
+  {"id":"blackout","name":"Blackout","types":["Fighting","Water"],"featured":"base1-7","cards":{"base1-52":4,"base1-34":2,"base1-62":3,"base1-56":3,"base1-7":1,"base1-65":3,"base1-63":4,"base1-42":2,"base1-27":2,"base1-92":4,"base1-79":1,"base1-93":1,"base1-84":1,"base1-88":1,"base1-97":16,"base1-102":12}},
+  {"id":"brushfire","name":"Brushfire","types":["Fire","Grass"],"featured":"base1-12","cards":{"base1-46":4,"base1-24":2,"base1-28":2,"base1-23":1,"base1-68":2,"base1-12":1,"base1-55":4,"base1-69":4,"base1-66":2,"base1-84":1,"base1-94":3,"base1-93":1,"base1-95":1,"base1-92":1,"base1-81":2,"base1-75":1,"base1-98":18,"base1-99":10}},
+  {"id":"overgrowth","name":"Overgrowth","types":["Grass","Water"],"featured":"base1-6","cards":{"base1-69":4,"base1-33":2,"base1-17":1,"base1-44":4,"base1-30":2,"base1-35":2,"base1-6":1,"base1-65":4,"base1-64":3,"base1-90":2,"base1-95":2,"base1-93":2,"base1-91":2,"base1-94":1,"base1-99":16,"base1-102":12}},
+  {"id":"zap","name":"Zap!","types":["Lightning","Psychic"],"featured":"base1-10","cards":{"base1-43":3,"base1-32":1,"base1-50":3,"base1-29":2,"base1-31":2,"base1-49":2,"base1-10":1,"base1-53":3,"base1-58":4,"base1-91":2,"base1-93":2,"base1-95":2,"base1-90":1,"base1-94":1,"base1-80":1,"base1-88":1,"base1-71":1,"base1-101":16,"base1-100":12}}
+]

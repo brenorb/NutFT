@@ -1,0 +1,46 @@
+node_modules/
+.venv/
+.venv312/
+dist/
+__pycache__/
+.ruff_cache/
+.pytest_cache/
+.DS_Store
+Thumbs.db
+*.db
+*.sqlite
+# SQLite's sidecars do NOT end in .db, so the rule above never covered them and
+# both ended up committed: 4 MB of live match state, seat tokens included,
+# redirtied by every local run. A clone also got a WAL with no database.
+*.db-wal
+*.db-shm
+.env
+.art-build.*.log
+.audit/
+art/generated/
+art/illustrations/
+art/qa/
+art/cards/placeholders/
+art/cards/node-runner-print/
+art/references/join-detailed-front/
+art/references/join-homepage/
+
+# Recompressed in place by scripts/optimize_art.py; the untouched sources
+# live here and are the script every re-run restores from. Not committed:
+# git history already holds the originals, and a second 17 MB copy of them
+# in the tree is weight with no new information in it.
+art/world-plates/original/
+
+# A database moved aside by hand is still a database. *.db does not match
+# matches.db.pre-r3-20260820_225142, and those files carry mint_seed and
+# catalog_private_key rows — one `git add -A` would put mint keys in a public
+# repo. Ignore anything that starts life as one.
+*.db.*
+*.sqlite.*
+
+.pokemon-state/
+site/pokemon/wallet-deps.js
+site/pokemon/runtime-prelude.js
+site/pokemon/engine.mjs
+site/pokemon/replay.mjs
+site/pokemon/build.json

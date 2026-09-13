@@ -1,0 +1,40 @@
+// @ts-nocheck — vendored MIT upstream; behavioral tests exercise this engine.
+import {
+  CardType,
+  PokemonCard,
+  Stage,
+} from '../common/index';
+
+export class Rattata extends PokemonCard {
+  public stage: Stage = Stage.BASIC;
+
+  public cardTypes: CardType[] = [CardType.COLORLESS];
+
+  public hp: number = 30;
+
+  public attacks = [
+    {
+      name: 'Bite',
+      cost: [CardType.COLORLESS],
+      damage: '20',
+      text: ''
+    },
+  ];
+
+  public weakness = [
+    { type: CardType.FIGHTING }
+  ];
+
+  public resistance = [
+    { type: CardType.PSYCHIC, value: -30 }
+  ];
+
+  public retreat = [];
+
+  public set: string = 'BS';
+
+  public name: string = 'Rattata';
+
+  public fullName: string = 'Rattata BS';
+
+}

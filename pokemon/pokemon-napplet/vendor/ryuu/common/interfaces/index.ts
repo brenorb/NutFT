@@ -1,0 +1,11 @@
+// @ts-nocheck — vendored MIT upstream; behavioral tests exercise this engine.
+export * from './avatar.interface';
+export * from './cards.interface';
+export * from './core.interface';
+export * from './deck.interface';
+export * from './login.interface';
+export * from './message.interface';
+export * from './profile.interface';
+export * from './rank.enum';
+export * from './ranking.interface';
+export * from './replay.interface';

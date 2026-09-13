@@ -1,0 +1,23 @@
+app = "nutft-pokemon-poc"
+primary_region = "gru"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  POKEMON_HOST = "0.0.0.0"
+  POKEMON_PORT = "8080"
+  POKEMON_ORIGIN = "https://nutft-pokemon-poc.fly.dev"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+[[mounts]]
+  source = "pokemon_state"
+  destination = "/app/.pokemon-state"
+  initial_size = "1gb"

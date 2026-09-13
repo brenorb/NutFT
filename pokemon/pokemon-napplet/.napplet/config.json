@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "sourceDir": ".",
+  "relays": [],
+  "blossomServers": [],
+  "defaultTarget": "named",
+  "named": [
+    "pokemon-poc"
+  ],
+  "discover": {
+    "enabled": true,
+    "roots": [
+      "."
+    ]
+  },
+  "signing": {
+    "mode": "interactive"
+  },
+  "conformance": {
+    "command": "napplet-conformance"
+  },
+  "paja": {
+    "command": "kehto"
+  },
+  "metadata": {
+    "name": "pokemon-poc",
+    "title": "Pokémon Base Set · PoC",
+    "description": "Unofficial test-only NutFT card battle",
+    "archetypes": []
+  }
+}

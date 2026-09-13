@@ -1,0 +1,15 @@
+import { build } from 'vite';
+import { mkdir, writeFile, copyFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const root = new URL('../../', import.meta.url).pathname;
+const out = root + 'site/pokemon';
+await mkdir(out, {recursive:true});
+await build({configFile:false, logLevel:'warn', build:{outDir:out, emptyOutDir:false, lib:{entry:root+'pokemon-napplet/src/engine.ts',formats:['es'],fileName:()=> 'engine.mjs'}, minify:false}});
+await build({configFile:false, logLevel:'warn', build:{outDir:out, emptyOutDir:false, lib:{entry:root+'pokemon-napplet/src/match.ts',formats:['es'],fileName:()=> 'replay.mjs'}, minify:false}});
+const esbuild = createRequire(import.meta.resolve('vite'))('esbuild');
+await esbuild.build({stdin:{contents:`import * as cashu from '@cashu/cashu-ts'; import * as bip39 from '@scure/bip39'; import { wordlist } from '@scure/bip39/wordlists/english.js'; import { HDKey } from '@scure/bip32'; window.__cashu=cashu; window.__walletCrypto={...bip39,wordlist,HDKey}; window.NUTFT_UNIT='POKEMON-BASE-POC'; window.NUTFT_STORE='pokemon:poc:wallet';`,resolveDir:root},bundle:true,format:'iife',outfile:out+'/wallet-deps.js',minify:true});
+await copyFile(require.resolve('@napplet/shim/prelude.global'),out+'/runtime-prelude.js');
+await copyFile(root+'pokemon-napplet/src/styles.css',out+'/game-style.css');
+await writeFile(out+'/build.json',JSON.stringify({engine:'ryuu-play@9cd20b6a3232b77ac114fb45a3979d51a4332850',cards:102}));
+console.log('Pokémon engine and offline wallet dependencies built');
