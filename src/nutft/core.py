@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import secrets
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field, replace
 from threading import RLock
 
@@ -94,6 +94,7 @@ class CardDefinition:
     image_url: str = ""
     properties: Mapping[str, object] = field(default_factory=dict)
     issuer_signature: str = ""
+    blob_hash: str = ""
 
     @property
     def card_id(self) -> str:
@@ -108,6 +109,7 @@ class CardDefinition:
             "rarity": self.rarity,
             "image_url": self.image_url,
             "properties": self.properties,
+            "blob_hash": self.blob_hash,
         }
         return hashlib.sha256(_canonical(payload).encode()).hexdigest()
 
@@ -485,6 +487,13 @@ class LocalMint:
 
     def is_spent(self, nullifier: str) -> bool:
         return nullifier in self._spent
+
+    def check_state(self, nullifiers: Iterable[str]) -> list[str]:
+        """Return NUT-07-style state labels for the supplied nullifiers."""
+        return [
+            "SPENT" if self.is_spent(nullifier) else "UNSPENT"
+            for nullifier in nullifiers
+        ]
 
     def is_booster_spent(self, booster_id: str) -> bool:
         return booster_id in self._spent_boosters
