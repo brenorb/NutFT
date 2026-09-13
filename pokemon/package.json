@@ -1,0 +1,26 @@
+{
+  "name": "nutft-pokemon-poc",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "npm run build:pokemon",
+    "test": "npm run test:js",
+    "table": "node server/table.js",
+    "test:js": "npm run build:pokemon && node --test tests/js/*.test.mjs",
+    "pokemon": "node server/pokemon.js",
+    "build:pokemon": "cd pokemon-napplet && pnpm install --frozen-lockfile && node scripts/build-pokemon.mjs && pnpm verify"
+  },
+  "dependencies": {
+    "@cashu/cashu-ts": "^4.7.2",
+    "@noble/curves": "^1.9.7",
+    "@resvg/resvg-js": "^2.6.2",
+    "@scure/bip32": "^2.3.0",
+    "@scure/bip39": "^2.3.0",
+    "marked": "^17.0.5",
+    "ws": "^8.21.1"
+  },
+  "devDependencies": {
+    "jsqr": "^1.4.0"
+  }
+}

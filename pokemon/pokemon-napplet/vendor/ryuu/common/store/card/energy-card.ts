@@ -1,0 +1,17 @@
+// @ts-nocheck — vendored MIT upstream; behavioral tests exercise this engine.
+import { Card } from './card';
+import { SuperType, CardType, EnergyType } from './card-types';
+
+
+export abstract class EnergyCard extends Card {
+
+  public superType: SuperType = SuperType.ENERGY;
+  
+  public energyType: EnergyType = EnergyType.BASIC;
+
+  public provides: CardType[] = [];
+
+  public provideAmount: number = 1;
+
+  public text: string = '';
+}

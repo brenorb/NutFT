@@ -1,0 +1,36 @@
+// @ts-nocheck — vendored MIT upstream; behavioral tests exercise this engine.
+import {
+  CardType,
+  PokemonCard,
+  Stage,
+} from '../common/index';
+
+export class Staryu extends PokemonCard {
+  public stage: Stage = Stage.BASIC;
+
+  public cardTypes: CardType[] = [CardType.WATER];
+
+  public hp: number = 40;
+
+  public attacks = [
+    {
+      name: 'Slap',
+      cost: [CardType.WATER],
+      damage: '20',
+      text: ''
+    },
+  ];
+
+  public weakness = [
+    { type: CardType.LIGHTNING }
+  ];
+
+  public retreat = [CardType.COLORLESS];
+
+  public set: string = 'BS';
+
+  public name: string = 'Staryu';
+
+  public fullName: string = 'Staryu BS';
+
+}

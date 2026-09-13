@@ -1,0 +1,99 @@
+{
+  "note": "Toy census, production algorithm. Match this before wiring anything up.",
+  "census": {
+    "C00": 10,
+    "C01": 10,
+    "C02": 10,
+    "C03": 10,
+    "U00": 6,
+    "U01": 6,
+    "U02": 6,
+    "R00": 5,
+    "R01": 5,
+    "J00": 2,
+    "G00": 1
+  },
+  "pools": {
+    "common": [
+      "C00",
+      "C01",
+      "C02",
+      "C03"
+    ],
+    "uncommon": [
+      "U00",
+      "U01",
+      "U02"
+    ],
+    "prime": [
+      "R00",
+      "R01",
+      "J00",
+      "G00"
+    ]
+  },
+  "slots": [
+    [
+      "common",
+      3
+    ],
+    [
+      "uncommon",
+      1
+    ],
+    [
+      "prime",
+      1
+    ]
+  ],
+  "commitment": "7cdc78b6ad80bdaa47544977f4381de32fdc5958c19642f9b60bd51d0a5adc85",
+  "beacon": "0000000000000000000123456789abcdef0123456789abcdef0123456789abcd",
+  "packs": [
+    {
+      "pack_id": "pack-0001",
+      "cards": [
+        "C02",
+        "C00",
+        "C01",
+        "U01",
+        "J00"
+      ],
+      "state": "cefa903aadc3d62bea406ecc6b79e89757b77f3c3c153c9eb3e68dd9818bc8ed"
+    },
+    {
+      "pack_id": "pack-0002",
+      "cards": [
+        "C00",
+        "C01",
+        "C02",
+        "U00",
+        "R01"
+      ],
+      "state": "f36b1b934368d7e88dd0d7624175591085313ab2ccece28ccfa73e37bb238a65"
+    },
+    {
+      "pack_id": "pack-0003",
+      "cards": [
+        "C03",
+        "C02",
+        "C01",
+        "U01",
+        "J00"
+      ],
+      "state": "15a06ed5369778d740866445bf2fcd3e0dba1f5c2f243b125c6e62ae0128217c"
+    }
+  ],
+  "remaining": {
+    "C00": 8,
+    "C01": 7,
+    "C02": 7,
+    "C03": 9,
+    "U00": 5,
+    "U01": 4,
+    "U02": 6,
+    "R00": 5,
+    "R01": 4,
+    "J00": 0,
+    "G00": 1
+  }
+}

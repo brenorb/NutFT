@@ -12,3 +12,7 @@ This repository currently contains two drafts:
 Both documents are exploratory drafts. NUT-31 is not an official Cashu NUT
 assignment. Generic Cashu operations that issue a new proof without preserving
 NutFT metadata are incompatible.
+
+The private repository also contains the migrated Pokemon proof of concept in
+[`pokemon/`](pokemon/). It is an application of NutFT and is kept separate from
+the protocol specifications above.

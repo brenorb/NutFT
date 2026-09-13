@@ -1,0 +1,8 @@
+.git
+.pokemon-state
+node_modules
+pokemon-napplet/node_modules
+tests
+outputs
+.venv
+*.log
