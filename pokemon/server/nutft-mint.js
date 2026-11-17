@@ -212,9 +212,10 @@ function createNutftMint(options = {}) {
    *
    * Longer than the invoice window on purpose: somebody who has actually sent
    * sats deserves more room to finish than somebody who only asked for a
-   * quote. When it lapses the pack simply becomes buyable again -- nothing has
-   * to be returned, because nothing was ever taken. state.counts is decremented
-   * in the CLAIM, so an unclaimed pack never left the mint. */
+   * quote. When it lapses the pack becomes buyable again. state.counts is
+   * decremented in the CLAIM, so an unclaimed pack never left the mint -- but
+   * the buyer's sats did, so if someone else buys and claims that pack first,
+   * requireSettled lets the paid invoice claim the pack then for sale. */
   const claimGraceSeconds = Number(options.claimGraceSeconds || process.env.NUTFT_CLAIM_GRACE_SECONDS || 3600);
   if (!Number.isFinite(claimGraceSeconds) || claimGraceSeconds < invoiceTtlSeconds) {
     throw new Error("NUTFT_CLAIM_GRACE_SECONDS must be at least NUTFT_INVOICE_TTL_SECONDS — a paid booster cannot be held for less time than an unpaid one");
@@ -430,6 +431,12 @@ function createNutftMint(options = {}) {
   const catalogIssuer = () => hex(schnorr.getPublicKey(catalogPrivateKey));
   const current = () => state.state;
   const packId = () => `pack-${String(state.nextPack).padStart(4, "0")}`;
+  /* A booster pack before the one now for sale has been claimed: packs are
+     sold in order and only a claim advances state.nextPack. */
+  const packAlreadySold = (id) => {
+    const match = /^pack-(\d+)$/.exec(String(id));
+    return Boolean(match) && Number(match[1]) < state.nextPack;
+  };
   const atomic = (work) => {
     if (!db) return work();
     db.exec("BEGIN IMMEDIATE");
@@ -713,7 +720,8 @@ function createNutftMint(options = {}) {
     if (!chain) {
       await requireSettled({ pack_id: row.pack_id }, paymentHash);
       const resolved = await quote();
-      if (resolved.pack_id !== row.pack_id || resolved.state !== row.state) throw new Error("stale booster quote");
+      const rebound = packAlreadySold(row.pack_id);
+      if (!rebound && (resolved.pack_id !== row.pack_id || resolved.state !== row.state)) throw new Error("stale booster quote");
       return { ...resolved, sealed: false };
     }
     if (!row.target_height) throw new Error("this sale was not sealed against a block");
@@ -748,7 +756,12 @@ function createNutftMint(options = {}) {
     if (!isPaymentRef(paymentHash)) throw new Error("payment_hash is not a valid payment reference");
     const row = q ? q.invoice.get(paymentHash) : null;
     if (!row) throw new Error("unknown payment_hash: quote the booster first");
-    if (row.pack_id !== expected.pack_id) throw new Error("this invoice was quoted for a different pack");
+    /* The invoice is bound to its pack, so one payment cannot be replayed
+       against whatever pack is next. The one exception is a pack that was sold
+       to someone else after this invoice's claim grace lapsed: the buyer has
+       paid, their pack is gone, and the claimed flag still limits the invoice
+       to one pack. They get the pack now for sale rather than nothing. */
+    if (row.pack_id !== expected.pack_id && !packAlreadySold(row.pack_id)) throw new Error("this invoice was quoted for a different pack");
     if (row.claimed) throw new Error("this invoice has already been claimed");
     let settledNow;
     try {
